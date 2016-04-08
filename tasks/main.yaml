@@ -6,7 +6,7 @@
       ansible_os_family == "RedHat"
 
 - name: Install sssd package for RedHat
-  yum:
+  package:
     name: "{{ sssd_pkg }}"
     state: present
   notify:
@@ -26,18 +26,17 @@
   tags:
     - sssd_config
 
+- name: Make sure sssd service is enabled
+  service:
+    name: sssd
+    enabled: yes
+  tags:
+    - sssd_service
+
 - name: Make sure sssd service is running
   service:
     name: sssd
     state: started
   register: sssd_service_started
   tags:
-    - sssd_config
-    - sssd_pkg
-
-- name: Make sure sssd service is enabled
-  service:
-    name: sssd
-    enabled: yes
-  tags:
-    - sssd_config
+    - sssd_service

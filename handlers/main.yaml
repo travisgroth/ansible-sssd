@@ -4,4 +4,6 @@
   service:
     name: sssd
     state: restarted
-  when: not sssd_service_started.changed
+  when: >
+    sssd_service_started is not defined or
+    not sssd_service_started.changed
