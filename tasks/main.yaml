@@ -8,7 +8,6 @@
 - name: Install sssd package for RedHat
   package:
     name: "{{ sssd_pkg }}"
-    state: present
   notify:
     - Restart sssd
   tags:
