@@ -1,0 +1,6 @@
+---
+- hosts: all
+  become: True
+  roles:
+    - ansible-sssd
+    - role: ansible-sssd

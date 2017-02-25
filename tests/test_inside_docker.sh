@@ -1,0 +1,50 @@
+#!/bin/bash
+set -xe
+distribution=$1
+version=$2
+module=ansible-sssd
+if [ "${distribution}" == 'centos' ] && [ "${version}" == '7' ]; then
+  init="/usr/lib/systemd/systemd"
+  run_opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+elif [ "${distribution}" == 'centos' ] && [ "${version}" == '6' ]; then
+  init="/sbin/init"
+  run_opts=""
+elif [ "$distribution" == "ubuntu" ] && [ ${version} == "14.04" ]; then
+  distribution="ubuntu-upstart"
+  init="/sbin/init"
+  run_opts=""
+elif [ "$distribution" == "ubuntu" ] && [ ${version} == "16.04" ]; then
+  init="/bin/systemd"
+  run_opts="--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+fi
+
+docker pull ${distribution}:${version}
+docker build --rm=true --file=tests/Dockerfile.${distribution}-${version} --tag=${distribution}-${version}:ansible tests
+
+container_id=$(mktemp)
+
+# Run container in detached state
+docker run --detach ${DOCKER_OPTS} --volume="${PWD}":/etc/ansible/roles/${module}:ro ${run_opts} ${distribution}-${version}:ansible "${init}" > "${container_id}"
+
+# Display Ansible version
+docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible --version
+
+# Install deps
+docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-galaxy install jtyr.config_encoder_filters
+
+# Basic role syntax check
+docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-playbook /etc/ansible/roles/${module}/tests/test.yml --syntax-check
+
+# Run the role/playbook with ansible-playbook
+docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-playbook /etc/ansible/roles/${module}/tests/test.yml
+
+docker exec "$(cat ${container_id})" ansible-playbook /etc/ansible/roles/${module}/tests/test.yml \
+ | grep -q 'changed=0.*failed=0' \
+&& (echo 'Idempotence test: pass' && exit 0) \
+|| (echo 'Idempotence test: fail' && exit 1) \
+
+# Clean up
+if [ "${LEAVE_RUNNING}" != "yes" ]; then
+  docker stop "$(cat ${container_id})"
+  docker rm -v "$(cat ${container_id})"
+fi

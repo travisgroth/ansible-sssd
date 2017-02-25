@@ -8,8 +8,14 @@ galaxy_info:
   platforms:
     - name: EL
       versions:
-        - all
+        - 6
+        - 7
+    - name: Ubuntu
+      versions:
+       - xenial
+       - trusty
   categories:
     - system
+
 dependencies:
-  - config_encoder_filters
+  - jtyr.config_encoder_filters

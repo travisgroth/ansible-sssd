@@ -2,10 +2,9 @@
 
 - name: Test distribution
   assert:
-    that: >
-      ansible_os_family == "RedHat"
+    that: (ansible_os_family == "RedHat") or (ansible_distribution == "Ubuntu")
 
-- name: Install sssd package for RedHat
+- name: Install sssd package
   package:
     name: "{{ sssd_pkg }}"
   notify:
