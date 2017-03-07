@@ -30,7 +30,7 @@ docker run --detach ${DOCKER_OPTS} --volume="${PWD}":/etc/ansible/roles/${module
 docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible --version
 
 # Install deps
-docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-galaxy install jtyr.config_encoder_filters
+docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-galaxy install jtyr.config_encoder_filters,master,config_encoder_filters
 
 # Basic role syntax check
 docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-playbook /etc/ansible/roles/${module}/tests/test.yml --syntax-check
