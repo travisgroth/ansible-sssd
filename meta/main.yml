@@ -10,12 +10,11 @@ galaxy_info:
       versions:
         - 6
         - 7
-    - name: Ubuntu
+    - name: Debian
       versions:
-       - xenial
-       - trusty
+        - all
   categories:
     - system
 
 dependencies:
-  - jtyr.config_encoder_filters
+  - config_encoder_filters
