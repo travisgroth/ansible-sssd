@@ -1,7 +1,7 @@
 ---
 
 galaxy_info:
-  author: Jiri Tyr
+  author: Travis Groth
   description: Role which helps to install sssd service.
   license: MIT
   min_ansible_version: 2.0
@@ -15,4 +15,4 @@ galaxy_info:
   categories:
     - system
 dependencies:
-  - config_encoder_filters
+  - jtyr.config_encoder_filters
